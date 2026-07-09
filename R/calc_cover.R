@@ -14,12 +14,14 @@
 #'   SEARCH (substring match) by default.
 #' @param exclude_regex Logical. If TRUE, elements of \code{exclude_classes}
 #'   are treated as regex patterns.
-#' @param exclude_tags Character vector of tag values. Any point carrying
-#'   any of these tags is dropped before the denominator is calculated.
+#' @param tag_exclude_relabel Character vector of replacement labels for
+#'   excluded tags. Must be the same length and order as
+#'   \code{exclude_tags}. For example:
+#'   \code{exclude_tags = c("Unattached","Dead")}
+#'   and
+#'   \code{tag_exclude_relabel = c("Unattached","Dead")}.
 #' @param tag_col Column holding each point's tags.
 #' @param tag_delim Delimiter used if \code{tag_col} is a string column.
-#' @param tag_exclude_relabel Value used to relabel tag-excluded points in
-#'   intermediate QC processing.
 #' @param recode_map Optional named character vector to merge/relabel classes
 #'   before calculating cover.
 #' @param image_id_col Character. Column identifying the image each point
@@ -46,7 +48,7 @@ calc_percent_cover <- function(annotations,
                                exclude_tags    = NULL,
                                tag_col         = "tag_names",
                                tag_delim       = "|",
-                               tag_exclude_relabel = "Unscoreable (tagged)",
+                               tag_exclude_relabel = NULL,
                                recode_map      = NULL,
                                image_id_col    = "point.media.key",
                                label_col       = "label.lineage_names",
@@ -82,11 +84,19 @@ calc_percent_cover <- function(annotations,
     dplyr::count(image_id, name = "n_excluded_by_tag")
 
   if (!is.null(tag_exclude_relabel)) {
+
+    tag_relabel <- .get_tag_relabel(
+      df$tags,
+      exclude_tags,
+      tag_exclude_relabel,
+      tag_delim
+    )
+
     df <- df %>%
       dplyr::mutate(
         label = dplyr::if_else(
-          excluded_by_tag,
-          tag_exclude_relabel,
+          !is.na(tag_relabel),
+          tag_relabel,
           label
         )
       )
@@ -309,4 +319,60 @@ calc_percent_cover <- function(annotations,
       logical(1)
     )
   }
+}
+
+
+#' Get relabel value for excluded tags
+#'
+#' @keywords internal
+#' @noRd
+.get_tag_relabel <- function(tag_names,
+                             exclude_tags,
+                             tag_exclude_relabel,
+                             delim) {
+
+  if (is.null(exclude_tags) ||
+      is.null(tag_exclude_relabel)) {
+    return(rep(NA_character_, length(tag_names)))
+  }
+
+  if (length(tag_exclude_relabel) != length(exclude_tags)) {
+    stop(
+      "`tag_exclude_relabel` must have the same length as `exclude_tags`."
+    )
+  }
+
+
+  vapply(
+    tag_names,
+    function(x) {
+
+      if (is.na(x) || x == "") {
+        return(NA_character_)
+      }
+
+      tags <- trimws(
+        strsplit(
+          as.character(x),
+          delim,
+          fixed = TRUE
+        )[[1]]
+      )
+
+      matched <- match(
+        tolower(tags),
+        tolower(exclude_tags)
+      )
+
+      if (all(is.na(matched))) {
+        return(NA_character_)
+      }
+
+      tag_exclude_relabel[
+        matched[!is.na(matched)][1]
+      ]
+
+    },
+    character(1)
+  )
 }
