@@ -11,7 +11,7 @@ calc_percent_cover(
   exclude_tags = NULL,
   tag_col = "tag_names",
   tag_delim = "|",
-  tag_exclude_relabel = "Unscoreable (tagged)",
+  tag_exclude_relabel = NULL,
   recode_map = NULL,
   image_id_col = "point.media.key",
   label_col = "label.lineage_names",
@@ -29,15 +29,16 @@ SEARCH (substring match) by default.}
 \item{exclude_regex}{Logical. If TRUE, elements of \code{exclude_classes}
 are treated as regex patterns.}
 
-\item{exclude_tags}{Character vector of tag values. Any point carrying
-any of these tags is dropped before the denominator is calculated.}
-
 \item{tag_col}{Column holding each point's tags.}
 
 \item{tag_delim}{Delimiter used if \code{tag_col} is a string column.}
 
-\item{tag_exclude_relabel}{Value used to relabel tag-excluded points in
-intermediate QC processing.}
+\item{tag_exclude_relabel}{Character vector of replacement labels for
+excluded tags. Must be the same length and order as
+\code{exclude_tags}. For example:
+\code{exclude_tags = c("Unattached","Dead")}
+and
+\code{tag_exclude_relabel = c("Unattached","Dead")}.}
 
 \item{recode_map}{Optional named character vector to merge/relabel classes
 before calculating cover.}

@@ -81,16 +81,32 @@ calc_percent_cover <- function(annotations,
 
   n_excluded_by_tag <- df %>%
     dplyr::filter(excluded_by_tag) %>%
-    dplyr::count(image_id, name = "n_excluded_by_tag")
+    dplyr::count(
+      image_id,
+      name = "n_excluded_by_tag"
+    )
 
+  # Optional QC relabelling only - do not modify label used for cover calculation
   if (!is.null(tag_exclude_relabel)) {
 
-    tag_relabel <- .get_tag_relabel(
-      df$tags,
-      exclude_tags,
-      tag_exclude_relabel,
-      tag_delim
-    )
+    df <- df %>%
+      dplyr::mutate(
+        tag_exclusion_label = .get_tag_relabel(
+          tags,
+          exclude_tags,
+          tag_exclude_relabel,
+          tag_delim
+        )
+      )
+
+  } else {
+
+    df <- df %>%
+      dplyr::mutate(
+        tag_exclusion_label = NA_character_
+      )
+
+  }
 
     df <- df %>%
       dplyr::mutate(
@@ -135,8 +151,11 @@ calc_percent_cover <- function(annotations,
 
 
   df_valid <- df %>%
-    dplyr::filter(!excluded)
-
+    dplyr::filter(
+      !excluded,
+      !is.na(label),
+      label != ""
+    )
 
   n_valid <- df_valid %>%
     dplyr::count(image_id, name = "n_points_valid")
@@ -189,6 +208,10 @@ calc_percent_cover <- function(annotations,
 
   # Calculate cover
   cover_long <- df_valid %>%
+    dplyr::filter(
+      !is.na(label),
+      label != ""
+    ) %>%
     dplyr::count(
       image_id,
       label,
