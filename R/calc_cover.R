@@ -178,7 +178,7 @@ calc_percent_cover <- function(annotations,
       "%d image(s) lost >50%% of points to exclusion:\n%s",
       nrow(low_valid),
       paste(
-        utils::capture.output(print(low_valid, n = Inf)),
+        utils::capture.output(print(low_valid)),
         collapse = "\n"
       )
     ))
