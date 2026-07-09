@@ -15,6 +15,9 @@
 #'   belongs to. Must match \code{image_id} in \code{scale_df}.
 #' @param label_col Character. Column holding the annotation label to
 #'   count and report density for.
+#' @importFrom dplyr %>%
+#' @importFrom dplyr filter
+#' @importFrom stringr str_detect
 #'
 #' @return A data frame with one row per image x label combination:
 #'   \code{image_id}, \code{label}, \code{n_points}, \code{image_area_m2},

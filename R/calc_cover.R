@@ -35,6 +35,10 @@
 #'   annotation metadata retained in long format) and
 #'   \code{qc} (per-image point totals, exclusions, and percent excluded).
 #'
+#'#' @importFrom dplyr %>%
+#' @importFrom dplyr filter
+#' @importFrom stringr str_detect
+#'
 #' @export
 calc_percent_cover <- function(annotations,
                                exclude_classes = NULL,
