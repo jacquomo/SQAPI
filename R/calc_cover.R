@@ -108,16 +108,6 @@ calc_percent_cover <- function(annotations,
 
   }
 
-    df <- df %>%
-      dplyr::mutate(
-        label = dplyr::if_else(
-          !is.na(tag_relabel),
-          tag_relabel,
-          label
-        )
-      )
-  }
-
   if (!is.null(exclude_classes)) {
 
     if (exclude_regex) {
