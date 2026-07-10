@@ -7,6 +7,7 @@
 calc_density(
   annotations,
   scale_df,
+  metadata_cols = NULL,
   laser_label_pattern = "laser",
   label_col = "label.lineage_names"
 )
@@ -16,20 +17,22 @@ calc_density(
 annotation point.}
 
 \item{scale_df}{Output of \code{\link{calc_laser_scale}} with one row per
-image and a \code{point.media.key} and \code{image_area_m2} column.}
+image and \code{point.media.key} and \code{image_area_m2}.}
 
-\item{laser_label_pattern}{Character. Regex (case-insensitive) used to
-exclude laser-dot annotations.}
+\item{metadata_cols}{Character vector of columns from \code{annotations}
+to retain in the output. Metadata are retained at the image x label level.}
 
-\item{label_col}{Character. Column holding the annotation label.}
+\item{laser_label_pattern}{Character. Regex used to exclude laser
+annotations.}
+
+\item{label_col}{Character. Column containing annotation labels.}
 }
 \value{
-The original annotation dataframe with added columns:
-\code{image_area_m2}, \code{n_points}, and \code{density_per_m2}.
+A data frame with one row per image x annotation class containing
+density metrics and selected metadata.
 }
 \description{
-Counts every non-laser annotation label (based on label.lineage_names)
-per image and divides by the image footprint area to give organism
-density in points per square metre. Density metrics are joined back onto
-the original annotation dataframe, retaining all annotation attributes.
+Counts every non-laser annotation label per image and divides by the image
+footprint area to calculate organism density. Selected metadata attributes
+from the original annotations dataframe are retained.
 }

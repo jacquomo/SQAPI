@@ -71,10 +71,6 @@ calc_density <- function(annotations,
         dplyr::all_of(label_col),
         dplyr::all_of(metadata_cols)
       ) %>%
-      dplyr::distinct()
-
-    # Ensure only one metadata record per image x label
-    metadata <- metadata %>%
       dplyr::group_by(
         point.media.key,
         .data[[label_col]]
@@ -87,7 +83,7 @@ calc_density <- function(annotations,
         metadata,
         by = c(
           "point.media.key",
-          setNames("label", label_col)
+          setNames(label_col, "label")
         )
       )
   }
