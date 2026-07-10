@@ -8,7 +8,6 @@ calc_laser_scale(
   annotations,
   laser_label_pattern = "laser",
   known_distance_cm = 10,
-  image_id_col = "point.media.key",
   x_col = "point.x",
   y_col = "point.y",
   width_col = "pixel_width",
@@ -22,14 +21,10 @@ calc_laser_scale(
 annotation point, including the two laser-dot points per image.}
 
 \item{laser_label_pattern}{Character. Regex matched against
-\code{label_col} (case-insensitive) to identify laser-dot
-annotations.}
+\code{label_col} (case-insensitive) to identify laser-dot annotations.}
 
-\item{known_distance_cm}{Numeric. The fixed real-world separation
-between the two laser dots on your rig, in centimetres.}
-
-\item{image_id_col}{Character. Column identifying the image each point
-belongs to.}
+\item{known_distance_cm}{Numeric. The fixed real-world separation between
+the two laser dots on your rig, in centimetres.}
 
 \item{x_col}{Character. Column holding point x coordinates.}
 
@@ -42,11 +37,11 @@ belongs to.}
 \item{label_col}{Character. Column holding annotation label used to
 identify laser points.}
 
-\item{coords_normalised}{Logical. TRUE if x/y coordinates are
-normalised 0-1 coordinates and need converting to pixels.}
+\item{coords_normalised}{Logical. TRUE if x/y coordinates are normalised
+0-1 coordinates and need converting to pixels.}
 }
 \value{
-A data frame with one row per image and columns:
+A data frame with one row per \code{point.media.key} and columns:
 \code{pixel_distance}, \code{width_px}, \code{height_px},
 \code{cm_per_pixel}, \code{pixels_per_cm},
 \code{image_width_cm}, \code{image_height_cm}, and
@@ -55,26 +50,5 @@ A data frame with one row per image and columns:
 \description{
 Uses two laser-dot annotation points per image (a fixed, known distance
 apart on the camera rig) to derive a scale factor for that image, and
-from it the real-world footprint area of the image. This is the
-standard laser-scale method for estimating organism density and image
-area from stereo-BRUV / AUV / ROV imagery where absolute scale is not
-otherwise known.
-}
-\details{
-Images with anything other than exactly two matching laser
-points are excluded because the true laser pair cannot be inferred
-reliably.
-}
-\examples{
-\dontrun{
-scale_df <- calc_laser_scale(
-  raw_all,
-  known_distance_cm = 10,
-  image_id_col = "point.media.key",
-  width_col = "pixel_width",
-  height_col = "pixel_height",
-  label_col = "label.lineage_names"
-)
-}
-
+from it the real-world footprint area of the image.
 }
