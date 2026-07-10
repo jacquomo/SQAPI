@@ -2,56 +2,33 @@
 #'
 #' Uses two laser-dot annotation points per image (a fixed, known distance
 #' apart on the camera rig) to derive a scale factor for that image, and
-#' from it the real-world footprint area of the image. This is the
-#' standard laser-scale method for estimating organism density and image
-#' area from stereo-BRUV / AUV / ROV imagery where absolute scale is not
-#' otherwise known.
+#' from it the real-world footprint area of the image.
 #'
 #' @param annotations A data frame of Squidle+ annotations, one row per
 #'   annotation point, including the two laser-dot points per image.
 #' @param laser_label_pattern Character. Regex matched against
-#'   \code{label_col} (case-insensitive) to identify laser-dot
-#'   annotations.
-#' @param known_distance_cm Numeric. The fixed real-world separation
-#'   between the two laser dots on your rig, in centimetres.
-#' @param image_id_col Character. Column identifying the image each point
-#'   belongs to.
+#'   \code{label_col} (case-insensitive) to identify laser-dot annotations.
+#' @param known_distance_cm Numeric. The fixed real-world separation between
+#'   the two laser dots on your rig, in centimetres.
 #' @param x_col Character. Column holding point x coordinates.
 #' @param y_col Character. Column holding point y coordinates.
 #' @param width_col Character. Column holding image pixel width.
 #' @param height_col Character. Column holding image pixel height.
 #' @param label_col Character. Column holding annotation label used to
 #'   identify laser points.
-#' @param coords_normalised Logical. TRUE if x/y coordinates are
-#'   normalised 0-1 coordinates and need converting to pixels.
+#' @param coords_normalised Logical. TRUE if x/y coordinates are normalised
+#'   0-1 coordinates and need converting to pixels.
 #'
-#' @return A data frame with one row per image and columns:
+#' @return A data frame with one row per \code{point.media.key} and columns:
 #'   \code{pixel_distance}, \code{width_px}, \code{height_px},
 #'   \code{cm_per_pixel}, \code{pixels_per_cm},
 #'   \code{image_width_cm}, \code{image_height_cm}, and
 #'   \code{image_area_m2}.
 #'
-#' @details Images with anything other than exactly two matching laser
-#'   points are excluded because the true laser pair cannot be inferred
-#'   reliably.
-#'
-#' @examples
-#' \dontrun{
-#' scale_df <- calc_laser_scale(
-#'   raw_all,
-#'   known_distance_cm = 10,
-#'   image_id_col = "point.media.key",
-#'   width_col = "pixel_width",
-#'   height_col = "pixel_height",
-#'   label_col = "label.lineage_names"
-#' )
-#' }
-#'
 #' @export
 calc_laser_scale <- function(annotations,
                              laser_label_pattern = "laser",
                              known_distance_cm = 10,
-                             image_id_col = "point.media.key",
                              x_col = "point.x",
                              y_col = "point.y",
                              width_col = "pixel_width",
@@ -60,7 +37,7 @@ calc_laser_scale <- function(annotations,
                              coords_normalised = TRUE) {
 
   required_cols <- c(
-    image_id_col,
+    "point.media.key",
     x_col,
     y_col,
     width_col,
@@ -88,7 +65,7 @@ calc_laser_scale <- function(annotations,
       )
     ) |>
     dplyr::transmute(
-      image_id = .data[[image_id_col]],
+      point.media.key = .data[["point.media.key"]],
       x = .data[[x_col]],
       y = .data[[y_col]],
       width_px = .data[[width_col]],
@@ -123,7 +100,7 @@ calc_laser_scale <- function(annotations,
 
   n_per_image <- laser_pts |>
     dplyr::count(
-      image_id,
+      point.media.key,
       name = "n_laser_pts"
     )
 
@@ -147,9 +124,9 @@ calc_laser_scale <- function(annotations,
     dplyr::semi_join(
       n_per_image |>
         dplyr::filter(n_laser_pts == 2),
-      by = "image_id"
+      by = "point.media.key"
     ) |>
-    dplyr::group_by(image_id) |>
+    dplyr::group_by(point.media.key) |>
     dplyr::summarise(
       pixel_distance = sqrt(
         diff(x_px)^2 +

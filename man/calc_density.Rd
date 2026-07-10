@@ -8,7 +8,6 @@ calc_density(
   annotations,
   scale_df,
   laser_label_pattern = "laser",
-  image_id_col = "point.media.key",
   label_col = "label.lineage_names"
 )
 }
@@ -16,42 +15,21 @@ calc_density(
 \item{annotations}{A data frame of Squidle+ annotations, one row per
 annotation point.}
 
-\item{scale_df}{Output of \code{\link{calc_laser_scale}} - a data frame
-with one row per image and an \code{image_area_m2} column.}
+\item{scale_df}{Output of \code{\link{calc_laser_scale}} with one row per
+image and a \code{point.media.key} and \code{image_area_m2} column.}
 
 \item{laser_label_pattern}{Character. Regex (case-insensitive) used to
-exclude laser-dot annotations from the counts. Should match whatever
-was passed to \code{\link{calc_laser_scale}}.}
+exclude laser-dot annotations.}
 
-\item{image_id_col}{Character. Column identifying the image each point
-belongs to. Must match \code{image_id} in \code{scale_df}.}
-
-\item{label_col}{Character. Column holding the annotation label to
-count and report density for.}
+\item{label_col}{Character. Column holding the annotation label.}
 }
 \value{
-A data frame with one row per image x label combination:
-\code{image_id}, \code{label}, \code{n_points}, \code{image_area_m2},
-\code{density_per_m2}.
+The original annotation dataframe with added columns:
+\code{image_area_m2}, \code{n_points}, and \code{density_per_m2}.
 }
 \description{
-Counts every non-laser annotation label (based on label.lineage_names) per image and divides by the
-image footprint area (from \code{\link{calc_laser_scale}}) to give
-organism density in points per square metre.
-}
-\details{
-If your workflow needs density from a different level (e.g.
-point-count annotations already summarised elsewhere, or biomass
-instead of raw counts), adapt the \code{count()} step accordingly -
-this function assumes one row per counted individual/point.
-}
-\examples{
-\dontrun{
-scale_df   <- calc_laser_scale(raw_all, known_distance_cm = 10)
-density_df <- calc_density(raw_all, scale_df)
-}
-
-}
-\seealso{
-\code{\link{calc_laser_scale}}
+Counts every non-laser annotation label (based on label.lineage_names)
+per image and divides by the image footprint area to give organism
+density in points per square metre. Density metrics are joined back onto
+the original annotation dataframe, retaining all annotation attributes.
 }
