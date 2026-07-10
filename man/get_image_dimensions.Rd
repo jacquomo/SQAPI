@@ -2,29 +2,28 @@
 % Please edit documentation in R/get_image_dimensions.R
 \name{get_image_dimensions}
 \alias{get_image_dimensions}
-\title{Get pixel dimensions of an image}
+\title{Add pixel dimensions to image metadata}
 \usage{
-get_image_dimensions(image_path)
+get_image_dimensions(
+  df,
+  media_col = "point.media.path_best",
+  show_progress = TRUE
+)
 }
 \arguments{
-\item{image_path}{Character. Path or URL to a single image file.}
+\item{df}{Data frame containing image paths.}
+
+\item{media_col}{Character. Name of the column containing full image paths
+or URLs.}
+
+\item{show_progress}{Logical. Display progress bar. Defaults to TRUE.}
 }
 \value{
-A named list with \code{pixel_width} and \code{pixel_height}
-(integers).
+The input data frame with \code{pixel_width} and
+\code{pixel_height} columns added.
 }
 \description{
-Reads a single image (local file or URL) and returns its pixel width
+Reads images from paths contained in a data frame and adds pixel width
 and height. Useful for converting Squidle+ normalised point coordinates
-to pixel coordinates when image dimensions are not present in the
-annotation export.
-}
-\details{
-Requires the \pkg{magick} package.
-}
-\examples{
-\dontrun{
-get_image_dimensions("https://example.com/image.jpg")
-}
-
+to pixel coordinates when image dimensions are not present in exports.
 }
