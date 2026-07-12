@@ -13,42 +13,42 @@ calc_laser_scale(
   width_col = "pixel_width",
   height_col = "pixel_height",
   label_col = "label.name",
-  coords_normalised = TRUE
+  coords_normalised = TRUE,
+  media_col = "point.media.key"
 )
 }
 \arguments{
 \item{annotations}{A data frame of Squidle+ annotations, one row per
 annotation point, including the two laser-dot points per image.}
 
-\item{laser_label_pattern}{Character. Regex matched against
-\code{label_col} (case-insensitive) to identify laser-dot annotations.}
+\item{laser_label_pattern}{(laser) Regex matched against \code{label_col}
+(case-insensitive) to identify laser-dot annotations.}
 
-\item{known_distance_cm}{Numeric. The fixed real-world separation between
+\item{known_distance_cm}{(laser) The fixed real-world separation between
 the two laser dots on your rig, in centimetres.}
 
-\item{x_col}{Character. Column holding point x coordinates.}
+\item{x_col, y_col}{(laser) Columns holding point x/y coordinates.}
 
-\item{y_col}{Character. Column holding point y coordinates.}
+\item{width_col, height_col}{Columns holding image pixel width/height.}
 
-\item{width_col}{Character. Column holding image pixel width.}
-
-\item{height_col}{Character. Column holding image pixel height.}
-
-\item{label_col}{Character. Column holding annotation label used to
+\item{label_col}{(laser) Column holding the annotation label used to
 identify laser points.}
 
-\item{coords_normalised}{Logical. TRUE if x/y coordinates are normalised
-0-1 coordinates and need converting to pixels.}
+\item{coords_normalised}{(laser) \code{TRUE} if x/y coordinates are
+normalised 0-1 coordinates and need converting to pixels.}
+
+\item{media_col}{Column identifying the image (default
+\code{"point.media.key"}, matching Squidle+ annotation exports).}
 }
 \value{
-A data frame with one row per \code{point.media.key} and columns:
-\code{pixel_distance}, \code{width_px}, \code{height_px},
-\code{cm_per_pixel}, \code{pixels_per_cm},
-\code{image_width_cm}, \code{image_height_cm}, and
-\code{image_area_m2}.
+See \code{\link[=calc_image_scale]{calc_image_scale()}}. \code{scale_method} is always
+\code{"laser"}.
 }
 \description{
 Uses two laser-dot annotation points per image (a fixed, known distance
 apart on the camera rig) to derive a scale factor for that image, and
-from it the real-world footprint area of the image.
+from it the real-world footprint area of the image. Prefer
+\code{\link[=calc_image_scale]{calc_image_scale()}} for a unified interface across laser/manual/
+altitude methods — this is kept as a standalone entry point since it's
+also called directly by \link{calc_image_scale(method = "laser")}.
 }
